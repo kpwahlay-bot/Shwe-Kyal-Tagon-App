@@ -1,0 +1,29 @@
+{
+  "entities": {
+    "AppData": {
+      "title": "AppData",
+      "description": "Synced state document holding company business data for all branches",
+      "type": "object",
+      "properties": {
+        "branches": { "type": "string", "description": "JSON array of branches" },
+        "users": { "type": "string", "description": "JSON array of user accounts" },
+        "employees": { "type": "string", "description": "JSON array of employees" },
+        "salaryRecords": { "type": "string", "description": "JSON array of salary records" },
+        "sales": { "type": "string", "description": "JSON array of daily sales" },
+        "expenses": { "type": "string", "description": "JSON array of daily expenses" },
+        "inventory": { "type": "string", "description": "JSON array of inventory items" },
+        "stockMovements": { "type": "string", "description": "JSON array of stock movements" },
+        "contacts": { "type": "string", "description": "JSON array of contact partners" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp of last update" },
+        "updatedBy": { "type": "string", "description": "User who performed the last sync" }
+      },
+      "required": ["updatedAt"]
+    }
+  },
+  "firestore": {
+    "/sktg_sync/main": {
+      "schema": "AppData",
+      "description": "Main application data document synced across all devices and AI Studio"
+    }
+  }
+}

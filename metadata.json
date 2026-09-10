@@ -1,0 +1,6 @@
+{
+  "name": "Shwe Kyal Tagon Management",
+  "description": "Enterprise Retail, Inventory, POS, Multi-Branch Operations, HR & Staff Payroll Calculation, Finance & Procurement, Treasury Cash/Bank Balances, and Financial P&L System for Shwe Kyal Tagon Co., Ltd. (MD: Daw Su Myat Win).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,11 +1,180 @@
 rules_version = '2';
+
+// Shwe Kyal Tagon ERP - Firestore security rules (v5)
+//
+// Basics
+//   * Every request needs a Firebase sign-in AND an active staff profile at users/{uid}.
+//   * Profiles are created and changed only by the MD.
+//   * ERP records live at erp/{collection}/items/{id}. The app never hard-deletes: a delete is saved
+//     as { deleted: true } so the other devices learn about it. Only the MD may do that (the Editor may
+//     also do it for HR data, matching the role document).
+//
+// Roles: MD, Editor, Manager, Sales Manager, Admin, Executive, Staff
+//
+// What these rules can NOT see: what is inside a record (discount amount, which branch a voucher
+// belongs to). Those limits stay in the app screens.
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /sktg_sync/{docId} {
-      allow read, write: if true;
+
+    // ---------------------------------------------------------------------
+    // Identity helpers
+    // ---------------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
     }
-    match /{document=**} {
-      allow read, write: if true;
+
+    function email() {
+      return request.auth.token.email != null ? request.auth.token.email.lower() : '';
     }
+
+    // Keep in sync with OWNER_EMAILS in src/utils/authProfile.ts.
+    function isOwnerEmail() {
+      return isSignedIn() && (email() == 'sumyatwin.sktg@gmail.com' || email() == 'wahwahlwin.1990@gmail.com');
+    }
+
+    function profilePath() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+
+    function hasActiveProfile() {
+      return isSignedIn() && exists(profilePath()) && get(profilePath()).data.status == 'active';
+    }
+
+    function myRole() {
+      return get(profilePath()).data.role;
+    }
+
+    function isMD() {
+      return isOwnerEmail() || (hasActiveProfile() && myRole() == 'MD');
+    }
+
+    function isEditor() {
+      return hasActiveProfile() && myRole() == 'Editor';
+    }
+
+    // MD or Editor (Finance & Policy): HR, payroll, targets
+    function isMDOrEditor() {
+      return isMD() || isEditor();
+    }
+
+    // May edit finished sales vouchers: MD, Editor, Manager, Sales Manager
+    function canEditVouchers() {
+      return isMDOrEditor() || (hasActiveProfile() && (myRole() == 'Manager' || myRole() == 'Sales Manager'));
+    }
+
+    // May read financial books (not plain Staff / Executive)
+    function canReadFinance() {
+      return canEditVouchers() || (hasActiveProfile() && myRole() == 'Admin');
+    }
+
+    // Any active staff member
+    function isStaff() {
+      return isMD() || hasActiveProfile();
+    }
+
+    // ---------------------------------------------------------------------
+    // ERP data: erp/{collection}/items/{id}
+    // ---------------------------------------------------------------------
+    function knownCollection(coll) {
+      return coll in [
+        'branches', 'employees', 'salaryRecords', 'sales', 'expenses', 'inventory',
+        'stockMovements', 'contacts', 'purchases', 'supplierReturns', 'supplierBenefits',
+        'treasuryAccounts', 'treasuryTransactions', 'interBranchTransfers', 'meta'
+      ];
+    }
+
+    // Payroll: only MD and Editor can even read it.
+    function isPayroll(coll) {
+      return coll == 'salaryRecords';
+    }
+
+    // Money books: read by Manager level and above; the POS still writes to them.
+    function isFinance(coll) {
+      return coll in ['expenses', 'purchases', 'supplierReturns', 'supplierBenefits', 'treasuryAccounts', 'treasuryTransactions', 'interBranchTransfers'];
+    }
+
+    // HR master data and settings: only MD/Editor change them.
+    function isHrOrSettings(coll) {
+      return coll in ['employees', 'branches', 'meta'];
+    }
+
+    function canReadErp(coll) {
+      return isPayroll(coll) ? isMDOrEditor() : (isFinance(coll) ? canReadFinance() : isStaff());
+    }
+
+    // Who may CREATE a new record / UPDATE an existing one
+    function canCreateErp(coll) {
+      return (isPayroll(coll) || isHrOrSettings(coll)) ? isMDOrEditor() : isStaff();
+    }
+
+    function canUpdateErp(coll) {
+      return (isPayroll(coll) || isHrOrSettings(coll)) ? isMDOrEditor()
+        : (coll == 'sales' ? canEditVouchers() : isStaff());
+    }
+
+    // Who may mark a record as deleted. MD everywhere; Editor only for HR/payroll data.
+    function canDeleteErp(coll) {
+      return isMD() || (isEditor() && (coll == 'employees' || coll == 'salaryRecords'));
+    }
+
+    function validErpItem() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['id', 'json', 'deleted', 'updatedAt', 'updatedBy'])
+        && d.keys().hasAll(['id', 'json', 'deleted', 'updatedAt', 'updatedBy'])
+        && d.id is string && d.id.size() > 0 && d.id.size() <= 300
+        && d.json is string && d.json.size() < 900000
+        && d.deleted is bool
+        && d.updatedAt == request.time
+        && d.updatedBy is string && d.updatedBy.size() <= 120;
+    }
+
+    match /erp/{coll}/items/{itemId} {
+      allow read: if knownCollection(coll) && canReadErp(coll);
+
+      allow create: if knownCollection(coll) && validErpItem() && canCreateErp(coll)
+        && (request.resource.data.deleted == false || canDeleteErp(coll));
+
+      allow update: if knownCollection(coll) && validErpItem() && canUpdateErp(coll)
+        && (request.resource.data.deleted == false || canDeleteErp(coll));
+
+      allow delete: if false;
+    }
+
+    // ---------------------------------------------------------------------
+    // Staff profiles: users/{firebaseUid}. Only the MD creates or changes them.
+    // ---------------------------------------------------------------------
+    function validProfile() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['name', 'phone', 'email', 'branchId', 'branchName', 'role', 'status', 'createdAt', 'createdBy'])
+        && d.keys().hasAll(['name', 'role', 'status', 'branchId'])
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 120
+        && d.role in ['MD', 'Editor', 'Manager', 'Sales Manager', 'Admin', 'Executive', 'Staff']
+        && d.status in ['active', 'inactive']
+        && d.branchId is string && d.branchId.size() <= 128;
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isMD());
+      allow create, update: if isMD() && validProfile();
+      allow delete: if isMD();
+    }
+
+    // ---------------------------------------------------------------------
+    // Shop settings (logo, voucher branches): sktg_sync/shop_settings
+    // The old whole-database document sktg_sync/main_v3 stays readable by the MD only, so the old data
+    // can still be recovered. Nothing writes to it any more.
+    // ---------------------------------------------------------------------
+    match /sktg_sync/shop_settings {
+      allow read: if isStaff();
+      allow write: if isMDOrEditor();
+    }
+
+    match /sktg_sync/main_v3 {
+      allow read: if isMD();
+      allow write: if false;
+    }
+
+    // Everything else is denied by default.
   }
 }

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 130" width="380" height="130">
+  <defs>
+    <linearGradient id="purpleBadgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5505b2" />
+      <stop offset="50%" stop-color="#4a039e" />
+      <stop offset="100%" stop-color="#3c0082" />
+    </linearGradient>
+  </defs>
+
+  <!-- Main Royal Purple Capsule Body -->
+  <rect x="4" y="4" width="372" height="122" rx="61" fill="url(#purpleBadgeGrad)" stroke="#FFFFFF" stroke-width="4" />
+
+  <!-- Inner Concentric White Border Ring -->
+  <rect x="11" y="11" width="358" height="108" rx="54" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-opacity="0.95" />
+
+  <!-- Left: Official Speed Star Emblem with Motion Streaks -->
+  <g id="speed-star-group">
+    <!-- Speed Motion Trailing Lines (Left of Star) -->
+    <g stroke="#FFFFFF" stroke-linecap="round">
+      <line x1="38" y1="52" x2="68" y2="52" stroke-width="4" />
+      <line x1="28" y1="62" x2="78" y2="62" stroke-width="4" />
+      <line x1="22" y1="72" x2="80" y2="72" stroke-width="4" />
+      <line x1="32" y1="82" x2="70" y2="82" stroke-width="4" />
+    </g>
+
+    <!-- Speed Trail Dots -->
+    <circle cx="30" cy="52" r="2.2" fill="#FFFFFF" />
+    <circle cx="20" cy="62" r="2.2" fill="#FFFFFF" />
+    <circle cx="15" cy="72" r="2.2" fill="#FFFFFF" />
+    <circle cx="24" cy="82" r="2.2" fill="#FFFFFF" />
+
+    <!-- 5-Pointed White Speed Star -->
+    <polygon points="80,24 93,52 123,55 100,77 107,107 80,90 53,107 60,77 37,55 67,52" fill="#FFFFFF" />
+
+    <!-- Stylized S Cutout inside star -->
+    <path d="M 74 56 C 85 56 89 60 89 64 C 89 68 84 70 78 71 C 72 72 70 75 70 78 C 70 82 74 85 82 85" fill="none" stroke="#4a039e" stroke-width="3.8" stroke-linecap="round" />
+  </g>
+
+  <!-- Right: Burmese Calligraphy Brand Stack -->
+  <g id="brand-text-group">
+    <!-- Main Title: ရွှေကြယ်တံခွန် -->
+    <text x="236" y="72" text-anchor="middle" fill="#FFFFFF" font-size="41" font-weight="900" font-family="'Noto Sans Myanmar', 'Pyidaungsu', 'Padauk', 'Myanmar Text', sans-serif" letter-spacing="0.5px">ရွှေကြယ်တံခွန်</text>
+
+    <!-- Little Star Accent on top of diacritic -->
+    <polygon points="288,40 291,46 297,47 293,51 294,57 288,54 282,57 284,51 280,47 286,46" fill="#FFFFFF" stroke="#4a039e" stroke-width="0.8" />
+
+    <!-- Subtitle: မိုဘိုင်း နှင့် ကွန်ပျူတာ -->
+    <text x="236" y="98" text-anchor="middle" fill="#FFFFFF" font-size="13" font-weight="bold" font-family="'Noto Sans Myanmar', 'Pyidaungsu', 'Padauk', 'Myanmar Text', sans-serif" letter-spacing="0.4px">မိုဘိုင်း နှင့် ကွန်ပျူတာ</text>
+
+    <!-- Underline beneath subtitle -->
+    <line x1="156" y1="104" x2="316" y2="104" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" />
+  </g>
+</svg>

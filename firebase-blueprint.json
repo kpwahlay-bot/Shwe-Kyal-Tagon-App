@@ -1,29 +1,280 @@
 {
   "entities": {
-    "AppData": {
-      "title": "AppData",
-      "description": "Synced state document holding company business data for all branches",
+    "InventoryItem": {
+      "title": "InventoryItem",
+      "description": "Individual stock inventory product item",
       "type": "object",
       "properties": {
-        "branches": { "type": "string", "description": "JSON array of branches" },
-        "users": { "type": "string", "description": "JSON array of user accounts" },
-        "employees": { "type": "string", "description": "JSON array of employees" },
-        "salaryRecords": { "type": "string", "description": "JSON array of salary records" },
-        "sales": { "type": "string", "description": "JSON array of daily sales" },
-        "expenses": { "type": "string", "description": "JSON array of daily expenses" },
-        "inventory": { "type": "string", "description": "JSON array of inventory items" },
-        "stockMovements": { "type": "string", "description": "JSON array of stock movements" },
-        "contacts": { "type": "string", "description": "JSON array of contact partners" },
-        "updatedAt": { "type": "string", "description": "ISO timestamp of last update" },
-        "updatedBy": { "type": "string", "description": "User who performed the last sync" }
+        "id": { "type": "string", "description": "Unique inventory item identifier" },
+        "name": { "type": "string", "description": "Product name" },
+        "category": { "type": "string", "description": "Category name" },
+        "brand": { "type": "string", "description": "Brand code or name" },
+        "model": { "type": "string", "description": "Model description" },
+        "sku": { "type": "string", "description": "SKU code" },
+        "price": { "type": "number", "description": "Selling price" },
+        "costPrice": { "type": "number", "description": "Cost price" },
+        "branchStock": { "type": "object", "description": "Stock count per branch" },
+        "updatedAt": { "type": "string", "description": "Last update timestamp" }
       },
-      "required": ["updatedAt"]
+      "required": ["id", "name", "category", "sku", "price"]
+    },
+    "SaleInvoice": {
+      "title": "SaleInvoice",
+      "description": "Retail POS sale invoice voucher",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Sale invoice ID" },
+        "invoiceNo": { "type": "string", "description": "Invoice voucher reference number" },
+        "branchId": { "type": "string", "description": "Branch where sale occurred" },
+        "totalAmount": { "type": "number", "description": "Total voucher value" },
+        "date": { "type": "string", "description": "Sale date" },
+        "items": { "type": "array", "description": "Sold items list" },
+        "updatedAt": { "type": "string", "description": "Timestamp" }
+      },
+      "required": ["id", "invoiceNo", "branchId", "totalAmount", "date"]
+    },
+    "ExpenseRecord": {
+      "title": "ExpenseRecord",
+      "description": "Daily store operating expense record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Expense record ID" },
+        "branchId": { "type": "string", "description": "Branch ID" },
+        "amount": { "type": "number", "description": "Expense amount" },
+        "category": { "type": "string", "description": "Expense category" },
+        "description": { "type": "string", "description": "Expense description" },
+        "date": { "type": "string", "description": "Date" }
+      },
+      "required": ["id", "branchId", "amount", "category", "date"]
+    },
+    "EmployeeProfile": {
+      "title": "EmployeeProfile",
+      "description": "HR Employee record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Employee ID" },
+        "name": { "type": "string", "description": "Full name" },
+        "branchId": { "type": "string", "description": "Assigned branch ID" },
+        "department": { "type": "string", "description": "Department name" },
+        "position": { "type": "string", "description": "Position designation" },
+        "role": { "type": "string", "description": "System role" },
+        "basicSalary": { "type": "number", "description": "Base salary in MMK" }
+      },
+      "required": ["id", "name", "branchId", "department", "position", "basicSalary"]
+    },
+    "BranchRecord": {
+      "title": "BranchRecord",
+      "description": "Store branch location profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Branch ID" },
+        "name": { "type": "string", "description": "Branch name" },
+        "code": { "type": "string", "description": "Branch code" },
+        "address": { "type": "string", "description": "Branch address" }
+      },
+      "required": ["id", "name", "code"]
+    },
+    "SalarySlipRecord": {
+      "title": "SalarySlipRecord",
+      "description": "Monthly employee payroll calculation record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Salary record ID" },
+        "employeeId": { "type": "string", "description": "Employee ID" },
+        "month": { "type": "string", "description": "Payroll month YYYY-MM" },
+        "netSalary": { "type": "number", "description": "Net payable salary" },
+        "paymentStatus": { "type": "string", "description": "Status" }
+      },
+      "required": ["id", "employeeId", "month", "netSalary"]
+    },
+    "PurchaseRecord": {
+      "title": "PurchaseRecord",
+      "description": "Supplier purchase order record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Purchase ID" },
+        "voucherNo": { "type": "string", "description": "Voucher number" },
+        "supplierName": { "type": "string", "description": "Supplier name" },
+        "totalAmount": { "type": "number", "description": "Total purchase cost" },
+        "date": { "type": "string", "description": "Purchase date" }
+      },
+      "required": ["id", "supplierName", "totalAmount", "date"]
+    },
+    "ContactRecord": {
+      "title": "ContactRecord",
+      "description": "Customer and supplier address book contact",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Contact ID" },
+        "name": { "type": "string", "description": "Contact name" },
+        "type": { "type": "string", "description": "CUSTOMER or SUPPLIER" },
+        "phone": { "type": "string", "description": "Phone number" }
+      },
+      "required": ["id", "name", "type"]
+    },
+    "StockMovementRecord": {
+      "title": "StockMovementRecord",
+      "description": "Inventory stock movement audit log",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Movement ID" },
+        "type": { "type": "string", "description": "STOCK_IN, STOCK_OUT, TRANSFER" },
+        "itemId": { "type": "string", "description": "Inventory item ID" },
+        "quantity": { "type": "number", "description": "Quantity moved" },
+        "timestamp": { "type": "string", "description": "Movement timestamp" }
+      },
+      "required": ["id", "type", "itemId", "quantity"]
+    },
+    "TreasuryAccountRecord": {
+      "title": "TreasuryAccountRecord",
+      "description": "Cash register or bank account balance ledger",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Account ID" },
+        "accountName": { "type": "string", "description": "Account name" },
+        "accountType": { "type": "string", "description": "CASH or BANK" },
+        "currentBalance": { "type": "number", "description": "Current balance" }
+      },
+      "required": ["id", "accountName", "accountType"]
+    },
+    "TreasuryTransactionRecord": {
+      "title": "TreasuryTransactionRecord",
+      "description": "Treasury financial cashflow transaction entry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Transaction ID" },
+        "accountId": { "type": "string", "description": "Treasury account ID" },
+        "amount": { "type": "number", "description": "Transaction amount" },
+        "type": { "type": "string", "description": "Income, Expense, Transfer" },
+        "date": { "type": "string", "description": "Transaction date" }
+      },
+      "required": ["id", "accountId", "amount", "type", "date"]
+    },
+    "InterBranchTransferRecord": {
+      "title": "InterBranchTransferRecord",
+      "description": "Inter-branch stock transfer record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Transfer ID" },
+        "transferNo": { "type": "string", "description": "Transfer voucher number" },
+        "fromBranchId": { "type": "string", "description": "Origin branch ID" },
+        "toBranchId": { "type": "string", "description": "Destination branch ID" },
+        "status": { "type": "string", "description": "PENDING or COMPLETED" }
+      },
+      "required": ["id", "fromBranchId", "toBranchId", "status"]
+    },
+    "SupplierReturnRecord": {
+      "title": "SupplierReturnRecord",
+      "description": "Supplier RMA and return voucher",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Return ID" },
+        "supplierName": { "type": "string", "description": "Supplier name" },
+        "amount": { "type": "number", "description": "Returned amount" },
+        "status": { "type": "string", "description": "PENDING or SETTLED" }
+      },
+      "required": ["id", "supplierName", "amount", "status"]
+    },
+    "SupplierBenefitRecord": {
+      "title": "SupplierBenefitRecord",
+      "description": "Supplier rebate and incentive benefit record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Benefit ID" },
+        "supplierName": { "type": "string", "description": "Supplier name" },
+        "amount": { "type": "number", "description": "Benefit claim amount" },
+        "status": { "type": "string", "description": "PENDING or CLAIMED" }
+      },
+      "required": ["id", "supplierName", "amount", "status"]
+    },
+    "UserAccountRecord": {
+      "title": "UserAccountRecord",
+      "description": "ERP user authentication and authorization profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "User ID or UID" },
+        "username": { "type": "string", "description": "Login username" },
+        "role": { "type": "string", "description": "MD, Manager, Cashier, Viewer" },
+        "branchId": { "type": "string", "description": "Assigned branch ID" }
+      },
+      "required": ["id", "username", "role"]
+    },
+    "SystemSettingRecord": {
+      "title": "SystemSettingRecord",
+      "description": "System-wide settings and custom configurations",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Setting ID (e.g. customPositions, shop_settings)" },
+        "value": { "type": "object", "description": "Setting data object" },
+        "updatedAt": { "type": "string", "description": "Update timestamp" }
+      },
+      "required": ["id"]
     }
   },
   "firestore": {
-    "/sktg_sync/main": {
-      "schema": "AppData",
-      "description": "Main application data document synced across all devices and AI Studio"
+    "/inventory/{itemId}": {
+      "schema": "InventoryItem",
+      "description": "1. ကုန်ပစ္စည်းများနှင့် စတော့စာရင်း - တစ်ပစ္စည်းချင်းစီအလိုက် itemId ဖြင့် သီးခြား Doc"
+    },
+    "/sales/{saleId}": {
+      "schema": "SaleInvoice",
+      "description": "2. အရောင်းဘောက်ချာများ (POS & Sales) - ဘောက်ချာတစ်ခုချင်းစီအလိုက် saleId ဖြင့် သီးခြား Doc"
+    },
+    "/expenses/{expenseId}": {
+      "schema": "ExpenseRecord",
+      "description": "3. နေ့စဉ် အသုံးစရိတ်များ - စရိတ်တစ်ခုချင်းစီအလိုက် expenseId ဖြင့် သီးခြား Doc"
+    },
+    "/employees/{employeeId}": {
+      "schema": "EmployeeProfile",
+      "description": "4. ဝန်ထမ်းအချက်အလက်များ (HR) - ဝန်ထမ်းတစ်ဦးချင်းစီအလိုက် employeeId ဖြင့် သီးခြား Doc"
+    },
+    "/branches/{branchId}": {
+      "schema": "BranchRecord",
+      "description": "5. ဆိုင်ခွဲများ - ဆိုင်ခွဲတစ်ခုချင်းစီအလိုက် branchId ဖြင့် သီးခြား Doc"
+    },
+    "/salary_records/{recordId}": {
+      "schema": "SalarySlipRecord",
+      "description": "6. လစာနှင့် ဆုကြေးမှတ်တမ်းများ - လစာမှတ်တမ်းတစ်ခုချင်းစီအလိုက် သီးခြား Doc"
+    },
+    "/purchases/{purchaseId}": {
+      "schema": "PurchaseRecord",
+      "description": "7. အဝယ်စာရင်းများ - Purchase တစ်ခုချင်းစီအလိုက် သီးခြား Doc"
+    },
+    "/contacts/{contactId}": {
+      "schema": "ContactRecord",
+      "description": "8. ဝယ်သူနှင့် ရောင်းသူစာရင်း - Contact တစ်ဦးချင်းစီအလိုက် သီးခြား Doc"
+    },
+    "/stock_movements/{movementId}": {
+      "schema": "StockMovementRecord",
+      "description": "9. စတော့ အဝင်အထွက် Audit Log - Movement တစ်ခုချင်းစီအလိုက် သီးခြား Doc"
+    },
+    "/treasury_accounts/{accountId}": {
+      "schema": "TreasuryAccountRecord",
+      "description": "10. ငွေစာရင်းနှင့် ဘဏ်အကောင့်များ - Account တစ်ခုချင်းစီအလိုက် သီးခြား Doc"
+    },
+    "/treasury_transactions/{transactionId}": {
+      "schema": "TreasuryTransactionRecord",
+      "description": "11. ငွေစာရင်း အပြောင်းအလဲများ - Transaction တစ်ခုချင်းစီအလိုက် သီးခြား Doc"
+    },
+    "/inter_branch_transfers/{transferId}": {
+      "schema": "InterBranchTransferRecord",
+      "description": "12. ဆိုင်ခွဲအချင်းချင်း လွှဲပြောင်းမှုများ - Transfer တစ်ခုချင်းစီအလိုက် သီးခြား Doc"
+    },
+    "/supplier_returns/{returnId}": {
+      "schema": "SupplierReturnRecord",
+      "description": "13. ကုန်ပစ္စည်း ပြန်ပို့/RMA မှတ်တမ်းများ - Return တစ်ခုချင်းစီအလိုက် သီးခြား Doc"
+    },
+    "/supplier_benefits/{benefitId}": {
+      "schema": "SupplierBenefitRecord",
+      "description": "14. Supplier အကျိုးခံစားခွင့်များ - Benefit တစ်ခုချင်းစီအလိုက် သီးခြား Doc"
+    },
+    "/users/{userId}": {
+      "schema": "UserAccountRecord",
+      "description": "15. သုံးစွဲသူ အကောင့်များနှင့် အခွင့်အရေးများ - User တစ်ဦးချင်းစီအလိုက် သီးခြား Doc"
+    },
+    "/system_settings/{settingId}": {
+      "schema": "SystemSettingRecord",
+      "description": "16. ဆိုင် Logo နှင့် စနစ်သတ်မှတ်ချက်များ - Setting တစ်ခုချင်းစီအလိုက် သီးခြား Doc"
     }
   }
 }

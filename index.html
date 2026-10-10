@@ -3,18 +3,120 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Shwe Kyal Tagon Management</title>
+    <script>
+      (function() {
+        try {
+          var makeMemStorage = function() {
+            var store = {};
+            return {
+              getItem: function(k) { return Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null; },
+              setItem: function(k, v) { store[k] = String(v); },
+              removeItem: function(k) { delete store[k]; },
+              clear: function() { store = {}; },
+              key: function(i) { return Object.keys(store)[i] || null; },
+              get length() { return Object.keys(store).length; }
+            };
+          };
+
+          var memLocal = makeMemStorage();
+          var memSession = makeMemStorage();
+
+          var testStorage = function(storageType) {
+            try {
+              var s = window[storageType];
+              if (!s) return false;
+              s.setItem('__test_storage__', '1');
+              s.removeItem('__test_storage__');
+              return true;
+            } catch (e) {
+              return false;
+            }
+          };
+
+          var installSafeStorage = function(storageType, memObj) {
+            var targets = [
+              typeof window !== 'undefined' ? window : null,
+              typeof Window !== 'undefined' ? Window.prototype : null,
+              typeof window !== 'undefined' ? Object.getPrototypeOf(window) : null,
+              typeof window !== 'undefined' && window.Storage ? window.Storage.prototype : null
+            ];
+            for (var i = 0; i < targets.length; i++) {
+              var t = targets[i];
+              if (!t) continue;
+              try {
+                Object.defineProperty(t, storageType, {
+                  get: function() { return memObj; },
+                  set: function() {},
+                  configurable: true,
+                  enumerable: true
+                });
+              } catch (e) {}
+            }
+          };
+
+          if (!testStorage('localStorage')) {
+            installSafeStorage('localStorage', memLocal);
+          }
+          if (!testStorage('sessionStorage')) {
+            installSafeStorage('sessionStorage', memSession);
+          }
+        } catch (e) {}
+
+        try {
+          var origWarn = console.warn.bind(console);
+          var origError = console.error.bind(console);
+          var isViteMsg = function(args) {
+            return args.some(function(arg) {
+              var str = String(arg && arg.message ? arg.message : (arg && arg.stack ? arg.stack : arg || ''));
+              return /\[vite\]/i.test(str) || /reading 'send'/i.test(str) || /WebSocket|ws:\/\/|wss:\/\//i.test(str);
+            }) || (args.length > 1 && String(args[0]).indexOf('[vite]') !== -1);
+          };
+          console.warn = function() {
+            var args = Array.prototype.slice.call(arguments);
+            if (!isViteMsg(args)) origWarn.apply(console, args);
+          };
+          console.error = function() {
+            var args = Array.prototype.slice.call(arguments);
+            if (!isViteMsg(args)) origError.apply(console, args);
+          };
+        } catch (e) {}
+      })();
+    </script>
+    <title>Shwe Kyal Tagon IT & Mobile</title>
     <meta name="description" content="Enterprise Retail, Inventory, POS, Multi-Branch Operations, HR & Staff Payroll Calculation, Finance & Procurement, Treasury Cash/Bank Balances, and Financial P&L System for Shwe Kyal Tagon Co., Ltd. (MD: Daw Su Myat Win)." />
-    <meta property="og:title" content="Shwe Kyal Tagon Management" />
+    <meta property="og:title" content="Shwe Kyal Tagon IT & Mobile" />
     <meta property="og:description" content="Enterprise Retail, Inventory, POS, Multi-Branch Operations, HR & Staff Payroll Calculation, Finance & Procurement, Treasury Cash/Bank Balances, and Financial P&L System for Shwe Kyal Tagon Co., Ltd. (MD: Daw Su Myat Win)." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="SKT POS" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="alternate icon" href="/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Myanmar:wght@300;400;500;600;700;800;900&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
   </head>
   <body class="bg-slate-50 text-slate-900 antialiased font-sans">
-    <div id="root"></div>
+    <div id="root">
+      <div id="initial-startup-loader" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%);color:#f8fafc;font-family:'Plus Jakarta Sans',sans-serif;padding:24px;text-align:center;">
+        <div style="width:56px;height:56px;border:3px solid rgba(245,158,11,0.25);border-top:3px solid #f59e0b;border-radius:50%;animation:sktgSpin 0.9s cubic-bezier(0.5,0.1,0.4,0.9) infinite;margin-bottom:20px;"></div>
+        <div style="font-size:17px;font-weight:800;color:#ffffff;letter-spacing:0.3px;margin-bottom:6px;">ရွှေကြယ်တံခွန် IT & Mobile POS</div>
+        <div style="font-size:12px;color:#94a3b8;font-weight:500;">စနစ်စတင်လည်ပတ်နေပါသည် • Data Cloud ချိတ်ဆက်နေပါသည်...</div>
+        <style>@keyframes sktgSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+      </div>
+    </div>
+    <script>
+      window.addEventListener('error', function(e) {
+        var loader = document.getElementById('initial-startup-loader');
+        if (loader) {
+          loader.innerHTML = '<div style="max-width:440px;background:#1e293b;border:1px solid #334155;border-radius:16px;padding:24px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.5);"><div style="font-size:32px;margin-bottom:12px;">⚠️</div><h3 style="margin:0 0 8px 0;font-size:15px;font-weight:700;color:#f8fafc;">စနစ်စတင်ချိန် အချက်ပြချက်</h3><p style="font-size:12px;color:#94a3b8;margin:0 0 16px 0;line-height:1.5;">' + (e && e.message ? String(e.message) : 'စနစ်စတင်ရန် စောင့်ဆိုင်းနေပါသည်...') + '</p><button onclick="location.reload()" style="background:#f59e0b;color:#0f172a;font-weight:700;border:none;padding:10px 20px;border-radius:10px;font-size:12px;cursor:pointer;">စနစ်အား ပြန်လည် Reload ပြုလုပ်မည်</button></div>';
+        }
+      });
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

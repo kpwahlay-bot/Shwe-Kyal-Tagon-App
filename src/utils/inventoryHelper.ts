@@ -1,7 +1,7 @@
 import { InventoryItem, DailySale } from '../types';
 
-export const SHOP_1_BRANCH_ID = 'branch-1';
-export const SYSTEM_2_BRANCH_ID = 'branch-sys2';
+export const SHOP_1_BRANCH_ID = 'SKTG1';
+export const SYSTEM_2_BRANCH_ID = 'SII';
 
 /**
  * Checks if a given branch ID represents System II (which shares stock with Shop 1).
@@ -79,6 +79,8 @@ export const syncBranchStocks = (
 
   synced[SHOP_1_BRANCH_ID] = sharedQty;
   synced[SYSTEM_2_BRANCH_ID] = sharedQty;
+  synced['branch-1'] = sharedQty;
+  synced['branch-sys2'] = sharedQty;
 
   return synced;
 };

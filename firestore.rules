@@ -175,6 +175,58 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ---------------------------------------------------------------------
+    // Normalized Top-Level Collections (Option A Architecture)
+    // ---------------------------------------------------------------------
+    match /sales/{id} {
+      allow read, write: if isStaff();
+    }
+    match /expenses/{id} {
+      allow read, write: if isStaff();
+    }
+    match /inventory/{id} {
+      allow read, write: if isStaff();
+    }
+    match /contacts/{id} {
+      allow read, write: if isStaff();
+    }
+    match /purchases/{id} {
+      allow read, write: if isStaff();
+    }
+    match /employees/{id} {
+      allow read: if isStaff();
+      allow write: if isMDOrEditor();
+    }
+    match /salary_records/{id} {
+      allow read, write: if isMDOrEditor();
+    }
+    match /branches/{id} {
+      allow read: if isStaff();
+      allow write: if isMDOrEditor();
+    }
+    match /inter_branch_transfers/{id} {
+      allow read, write: if isStaff();
+    }
+    match /stock_movements/{id} {
+      allow read, write: if isStaff();
+    }
+    match /supplier_benefits/{id} {
+      allow read, write: if isStaff();
+    }
+    match /supplier_returns/{id} {
+      allow read, write: if isStaff();
+    }
+    match /treasury_accounts/{id} {
+      allow read, write: if isStaff();
+    }
+    match /treasury_transactions/{id} {
+      allow read, write: if isStaff();
+    }
+    match /system_settings/{id} {
+      allow read: if isStaff();
+      allow write: if isMDOrEditor();
+    }
+
     // Everything else is denied by default.
   }
 }

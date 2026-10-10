@@ -18,7 +18,7 @@
  * - /salary_records/{salaryId}
  */
 
-import { doc, setDoc, deleteDoc, collection, getDocs, writeBatch } from 'firebase/firestore';
+import { doc, setDoc, deleteDoc, collection, getDocs, writeBatch, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import {
   Branch,
@@ -233,5 +233,45 @@ export async function migrateAllToCleanCollections(
     });
 
     return { success: false, migratedCount: completedItems, error: friendlyError };
+  }
+}
+
+/**
+ * Loads data from a top-level collection with optional branch filtering (Option A).
+ * When a specific branchId (e.g. 'SKTG1') is provided, queries strictly documents matching that branchId,
+ * drastically reducing Firestore document read consumption.
+ */
+export async function fetchCollectionWithBranchFilter<T>(
+  collectionName: string,
+  branchId?: string
+): Promise<T[]> {
+  try {
+    const collRef = collection(db, collectionName);
+    let q;
+    if (branchId && branchId !== 'ALL') {
+      const aliases = [branchId];
+      if (branchId === 'SKTG1' || branchId === 'branch-1') {
+        aliases.push('SKTG1', 'branch-1');
+      } else if (branchId === 'SKTG2' || branchId === 'branch-2') {
+        aliases.push('SKTG2', 'branch-2');
+      } else if (branchId === 'SKTG3' || branchId === 'branch-3') {
+        aliases.push('SKTG3', 'branch-3');
+      } else if (branchId === 'SII' || branchId === 'branch-sys2') {
+        aliases.push('SII', 'branch-sys2');
+      }
+      const uniqueAliases = Array.from(new Set(aliases));
+      q = query(collRef, where('branchId', 'in', uniqueAliases));
+    } else {
+      q = query(collRef);
+    }
+    const snap = await getDocs(q);
+    const results: T[] = [];
+    snap.forEach((docSnap) => {
+      results.push(docSnap.data() as T);
+    });
+    return results;
+  } catch (err) {
+    console.warn(`[collectionSync] Query failed for ${collectionName}:`, err);
+    return [];
   }
 }

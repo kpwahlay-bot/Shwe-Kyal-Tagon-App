@@ -2,8 +2,8 @@ import { Branch, Employee, UserAccount, UserRole, SalaryRecord, normalizeUserRol
 
 export const SKTG_BRANCHES: Branch[] = [
   {
-    id: 'branch-1',
-    code: 'CS-01',
+    id: 'SKTG1',
+    code: 'SKTG1',
     name: 'Shwe Kyal Tagon (Shop 1)',
     city: 'Yangon',
     address: 'Building (84), Room (1+2), Nawade Shopping Mall, Kyansittha Road, Hlaing Tharyar (East) Township.',
@@ -12,8 +12,8 @@ export const SKTG_BRANCHES: Branch[] = [
     laptopTarget: 25,
   },
   {
-    id: 'branch-2',
-    code: 'CS-02',
+    id: 'SKTG2',
+    code: 'SKTG2',
     name: 'Shwe Kyal Tagon (Shop 2)',
     city: 'Yangon',
     address: 'No. (17/2005), (20) Ward, Anawrahta Main Road, Hlaing Tharyar (West) Township.',
@@ -22,8 +22,8 @@ export const SKTG_BRANCHES: Branch[] = [
     laptopTarget: 20,
   },
   {
-    id: 'branch-3',
-    code: 'CS-03',
+    id: 'SKTG3',
+    code: 'SKTG3',
     name: 'Shwe Kyal Tagon (Shop 3)',
     city: 'Yangon',
     address: 'No. (506/A+B), (20) Ward, Anawrahta Main Road, Hlaing Tharyar (West) Township.',
@@ -32,8 +32,8 @@ export const SKTG_BRANCHES: Branch[] = [
     laptopTarget: 15,
   },
   {
-    id: 'branch-sys2',
-    code: 'System II',
+    id: 'SII',
+    code: 'SII',
     name: 'System II',
     city: 'Yangon',
     address: 'B/84B, Room (3+4+5+6), Nawade Shop House, Kyansittha Road, Hlaing Tharyar (East) Township (Near Pagoda Road Traffic Light)',
@@ -51,35 +51,39 @@ export const normalizeBranch = (branch: Branch): Branch => {
   const lowerName = (branch.name || '').toLowerCase();
   const lowerId = (branch.id || '').toLowerCase();
   if (
+    lowerId === 'sktg1' ||
     lowerId === 'branch-1' ||
     lowerId === 'branch-main' ||
+    lowerId === 'cs-01' ||
     lowerName.includes('shop 1') ||
     lowerName.includes('main store') ||
     lowerName === 'main' ||
     lowerName.includes('head office') ||
     lowerName.includes('နဝဒေး')
   ) {
-    return { ...branch, id: 'branch-1', name: 'Shwe Kyal Tagon (Shop 1)', code: branch.code && branch.code !== 'MAIN' ? branch.code : 'CS-01' };
+    return { ...branch, id: 'SKTG1', name: 'Shwe Kyal Tagon (Shop 1)', code: 'SKTG1' };
   }
-  if (lowerId === 'branch-2' || lowerName.includes('shop 2') || lowerName.includes('အနော်ရထာ')) {
-    return { ...branch, id: 'branch-2', name: 'Shwe Kyal Tagon (Shop 2)', code: branch.code || 'CS-02' };
+  if (lowerId === 'sktg2' || lowerId === 'branch-2' || lowerId === 'cs-02' || lowerName.includes('shop 2') || lowerName.includes('အနော်ရထာ')) {
+    return { ...branch, id: 'SKTG2', name: 'Shwe Kyal Tagon (Shop 2)', code: 'SKTG2' };
   }
-  if (lowerId === 'branch-3' || lowerName.includes('shop 3') || lowerName.includes('၅၀၆')) {
-    return { ...branch, id: 'branch-3', name: 'Shwe Kyal Tagon (Shop 3)', code: branch.code || 'CS-03' };
+  if (lowerId === 'sktg3' || lowerId === 'branch-3' || lowerId === 'cs-03' || lowerName.includes('shop 3') || lowerName.includes('၅၀၆')) {
+    return { ...branch, id: 'SKTG3', name: 'Shwe Kyal Tagon (Shop 3)', code: 'SKTG3' };
   }
   if (
+    lowerId === 'sii' ||
     lowerId === 'branch-sys2' ||
     lowerName.includes('system ii') ||
     branch.code?.toLowerCase() === 'sys-02' ||
     branch.code === 'Shwe Kyal Tagon' ||
-    branch.code?.toLowerCase() === 'system ii'
+    branch.code?.toLowerCase() === 'system ii' ||
+    branch.code === 'SII'
   ) {
     const isOldAddress = !branch.address || branch.address.includes('လှိုင်သာယာ');
     const isOldPhone = !branch.phone || branch.phone === '09 263027177';
     return {
       ...branch,
-      id: 'branch-sys2',
-      code: 'System II',
+      id: 'SII',
+      code: 'SII',
       name: 'System II',
       address: isOldAddress ? 'B/84B, Room (3+4+5+6), Nawade Shop House, Kyansittha Road, Hlaing Tharyar (East) Township.' : branch.address,
       phone: isOldPhone ? '09 453077667, 09 457063667' : branch.phone,
@@ -106,7 +110,7 @@ export const cleanAndNormalizeBranches = (rawBranches: Branch[]): Branch[] => {
       map.set(normalized.id, normalized);
     }
   }
-  const canonicalIds = ['branch-1', 'branch-2', 'branch-3', 'branch-sys2'];
+  const canonicalIds = ['SKTG1', 'SKTG2', 'SKTG3', 'SII'];
   const result: Branch[] = [];
   for (const id of canonicalIds) {
     const found = map.get(id) || SKTG_BRANCHES.find((b) => b.id === id);
@@ -133,7 +137,7 @@ export function normalizeEmployeeBranch(
 
   // Yamin Nwe (EC010) & Han Thazin Nway (EC013) are strictly Shop 1 staff!
   if (code === 'EC010' || code === 'EC-010' || code === 'EC013' || code === 'EC-013') {
-    return { branchId: 'branch-1', branchName: 'Shwe Kyal Tagon (Shop 1)' };
+    return { branchId: 'SKTG1', branchName: 'Shwe Kyal Tagon (Shop 1)' };
   }
 
   // Eradicate any reference to "Main Store", "Main", or "branch-main"
@@ -154,24 +158,24 @@ export function normalizeEmployeeBranch(
         return { branchId: canonical.branchId, branchName: canonical.branchName };
       }
     }
-    return { branchId: 'branch-1', branchName: 'Shwe Kyal Tagon (Shop 1)' };
+    return { branchId: 'SKTG1', branchName: 'Shwe Kyal Tagon (Shop 1)' };
   }
 
-  if (rawId === 'branch-1' || rawName.includes('Shop 1')) {
-    return { branchId: 'branch-1', branchName: 'Shwe Kyal Tagon (Shop 1)' };
+  if (rawId === 'SKTG1' || rawId === 'branch-1' || rawName.includes('Shop 1')) {
+    return { branchId: 'SKTG1', branchName: 'Shwe Kyal Tagon (Shop 1)' };
   }
-  if (rawId === 'branch-2' || rawName.includes('Shop 2')) {
-    return { branchId: 'branch-2', branchName: 'Shwe Kyal Tagon (Shop 2)' };
+  if (rawId === 'SKTG2' || rawId === 'branch-2' || rawName.includes('Shop 2')) {
+    return { branchId: 'SKTG2', branchName: 'Shwe Kyal Tagon (Shop 2)' };
   }
-  if (rawId === 'branch-3' || rawName.includes('Shop 3')) {
-    return { branchId: 'branch-3', branchName: 'Shwe Kyal Tagon (Shop 3)' };
+  if (rawId === 'SKTG3' || rawId === 'branch-3' || rawName.includes('Shop 3')) {
+    return { branchId: 'SKTG3', branchName: 'Shwe Kyal Tagon (Shop 3)' };
   }
-  if (rawId === 'branch-sys2' || rawName.includes('System II')) {
-    return { branchId: 'branch-sys2', branchName: 'System II' };
+  if (rawId === 'SII' || rawId === 'branch-sys2' || rawName.includes('System II')) {
+    return { branchId: 'SII', branchName: 'System II' };
   }
 
   return {
-    branchId: rawId || 'branch-1',
+    branchId: rawId || 'SKTG1',
     branchName: rawName || 'Shwe Kyal Tagon (Shop 1)',
   };
 }

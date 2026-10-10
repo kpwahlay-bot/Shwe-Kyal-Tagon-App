@@ -34,10 +34,10 @@ export const isInvalidStaff = (name?: string): boolean => {
 export const isStaffInBranch = (emp: Employee, branchId?: string): boolean => {
   if (!branchId || branchId === 'ALL') return true;
   if (emp.branchId === branchId) return true;
-  if (branchId === 'branch-1' && (emp.branchName?.includes('Shop 1') || emp.branchName?.includes('နဝဒေး'))) return true;
-  if (branchId === 'branch-2' && (emp.branchName?.includes('Shop 2') || emp.branchName?.includes('အနော်ရထာ (၁၀)'))) return true;
-  if (branchId === 'branch-3' && (emp.branchName?.includes('Shop 3') || emp.branchName?.includes('အနော်ရထာ (၅၀၆)'))) return true;
-  if (branchId === 'branch-sys2' && (emp.branchName?.includes('System II') || emp.branchName?.includes('SYS-02') || emp.branchName?.includes('SII'))) return true;
+  if ((branchId === 'SKTG1' || branchId === 'branch-1') && (emp.branchName?.includes('Shop 1') || emp.branchName?.includes('နဝဒေး') || emp.branchId === 'SKTG1' || emp.branchId === 'branch-1')) return true;
+  if ((branchId === 'SKTG2' || branchId === 'branch-2') && (emp.branchName?.includes('Shop 2') || emp.branchName?.includes('အနော်ရထာ') || emp.branchId === 'SKTG2' || emp.branchId === 'branch-2')) return true;
+  if ((branchId === 'SKTG3' || branchId === 'branch-3') && (emp.branchName?.includes('Shop 3') || emp.branchName?.includes('၅၀၆') || emp.branchId === 'SKTG3' || emp.branchId === 'branch-3')) return true;
+  if ((branchId === 'SII' || branchId === 'branch-sys2') && (emp.branchName?.includes('System II') || emp.branchName?.includes('SYS-02') || emp.branchName?.includes('SII') || emp.branchId === 'SII' || emp.branchId === 'branch-sys2')) return true;
   return false;
 };
 

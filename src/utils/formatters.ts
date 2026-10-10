@@ -1274,10 +1274,10 @@ export const getBranchName = (
     const found = branches.find((b) => b.id === branchId);
     if (found?.name) return found.name;
   }
-  if (branchId === 'branch-1') return 'Shwe Kyal Tagon (Shop 1)';
-  if (branchId === 'branch-2') return 'Shwe Kyal Tagon (Shop 2)';
-  if (branchId === 'branch-3') return 'Shwe Kyal Tagon (Shop 3)';
-  if (branchId === 'branch-sys2') return 'System II';
+  if (branchId === 'SKTG1' || branchId === 'branch-1') return 'Shwe Kyal Tagon (Shop 1)';
+  if (branchId === 'SKTG2' || branchId === 'branch-2') return 'Shwe Kyal Tagon (Shop 2)';
+  if (branchId === 'SKTG3' || branchId === 'branch-3') return 'Shwe Kyal Tagon (Shop 3)';
+  if (branchId === 'SII' || branchId === 'branch-sys2') return 'System II';
   return fallbackName || branchId;
 };
 

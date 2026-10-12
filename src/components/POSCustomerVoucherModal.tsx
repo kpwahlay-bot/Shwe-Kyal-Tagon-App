@@ -24,6 +24,7 @@ import {
   getSavedVoucherBranches
 } from './ShopLogoSettingsModal';
 import { getDefaultCashierForBranch, getDefaultFinanceForBranch } from '../utils/staffBranchHelper';
+import { printHtmlDirectly } from '../utils/printHelpers';
 
 export type VoucherPrintType = 'invoice' | 'receipt';
 
@@ -352,11 +353,94 @@ export const POSCustomerVoucherModal: React.FC<POSCustomerVoucherModalProps> = (
     }
     const originalTitle = document.title;
     const vNo = getFormattedVoucherNo(sale?.invoiceNo, activeType);
+    const docTitle = activeType === 'receipt' ? `Receipt_${vNo}` : `Commercial_Invoice_${vNo}`;
     try {
-      document.title = activeType === 'receipt' ? `Receipt_${vNo}` : `Commercial_Invoice_${vNo}`;
+      document.title = docTitle;
     } catch (e) {
       // ignore
     }
+
+    const printArea = document.getElementById('commercial-invoice-print-area');
+    if (printArea) {
+      // Collect styles from document to preserve all colors, fonts, and borders
+      const styleSheets = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+        .map((s) => s.outerHTML)
+        .join('\n');
+
+      const printHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>${docTitle}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+Myanmar:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  ${styleSheets}
+  <style>
+    @page {
+      size: A5 ${printOrientation};
+      margin: 0mm;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      -webkit-font-smoothing: antialiased !important;
+      -moz-osx-font-smoothing: grayscale !important;
+    }
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #ffffff !important;
+      width: ${printOrientation === 'portrait' ? '148mm' : '210mm'} !important;
+      height: ${printOrientation === 'portrait' ? '210mm' : '148mm'} !important;
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Myanmar', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+      overflow: hidden !important;
+    }
+    #commercial-invoice-print-area {
+      position: static !important;
+      transform: none !important;
+      margin: 0 auto !important;
+      width: ${printOrientation === 'portrait' ? '148mm' : '210mm'} !important;
+      height: ${printOrientation === 'portrait' ? '205mm' : '145mm'} !important;
+      max-height: ${printOrientation === 'portrait' ? '206mm' : '145.5mm'} !important;
+      box-sizing: border-box !important;
+      padding: ${printOrientation === 'portrait' ? '3.5mm 4.5mm 3.5mm 4.5mm' : '3.5mm 5mm 3.5mm 5mm'} !important;
+      box-shadow: none !important;
+      border: none !important;
+      background: #ffffff !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      overflow: hidden !important;
+    }
+    ${activeType === 'receipt' ? `
+      .letterhead-box,
+      .letterhead-box *,
+      .item-subdetail-tax-safe {
+        visibility: hidden !important;
+        opacity: 0 !important;
+        display: none !important;
+      }
+    ` : ''}
+  </style>
+</head>
+<body>
+  ${printArea.outerHTML}
+</body>
+</html>`;
+
+      printHtmlDirectly(printHtml);
+      setTimeout(() => {
+        try {
+          document.title = originalTitle;
+        } catch (e) {
+          // ignore
+        }
+      }, 1500);
+      return;
+    }
+
     const printClass = activeType === 'receipt' ? 'printing-receipt' : 'printing-commercial-invoice';
     document.body.classList.add(printClass);
     window.print();

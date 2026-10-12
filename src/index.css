@@ -81,11 +81,9 @@ pre {
   .no-print * {
     display: none !important;
   }
-  body.has-print-modal #app-main-content,
   body.has-print-modal aside,
   body.has-print-modal header,
   body.has-print-modal nav,
-  body:has(.printable-modal) #app-main-content,
   body:has(.printable-modal) aside,
   body:has(.printable-modal) header,
   body:has(.printable-modal) nav {

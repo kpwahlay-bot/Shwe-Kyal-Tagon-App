@@ -5077,7 +5077,7 @@ const normalizeSalesInvoiceNo = (list: DailySale[]): DailySale[] => {
   const handleBrowserRefresh = async () => {
     setCloudSyncStatus('syncing');
     try {
-      // 1. Fetch latest authoritative snapshot from Firestore/REST proxy
+      // 1. Fetch latest authoritative snapshot from Firestore
       const cloudData = await pullAllCloudData();
       if (cloudData) {
         processAndMergeCloudData(cloudData);
@@ -5166,7 +5166,7 @@ const normalizeSalesInvoiceNo = (list: DailySale[]): DailySale[] => {
       />
 
       {/* Main Content Area */}
-      <div id="app-main-content" className="flex-1 flex flex-col min-w-0 overflow-hidden w-full print:hidden">
+      <div id="app-main-content" className="flex-1 flex flex-col min-w-0 overflow-hidden w-full print:overflow-visible print:h-auto print:min-h-0 print:block">
         {/* Top Header */}
         <Topbar
           branches={branches}
@@ -5246,7 +5246,7 @@ const normalizeSalesInvoiceNo = (list: DailySale[]): DailySale[] => {
                         <span>🔄 Retry Sync / Check Quota</span>
                       </button>
                       <a
-                        href="https://console.firebase.google.com/project/gen-lang-client-0740702082/firestore/databases/ai-studio-shwekyaltakhunhr-e89ca48a-0704-4173-a2ae-8e8e441f2ed2/data?openUpgradeDialog=true"
+                        href="https://console.firebase.google.com/project/gen-lang-client-0794645955/firestore/databases/ai-studio-remixshwekyaltag-16a89cd6-3a3a-4743-9d03-d11d5bd9266b/data?openUpgradeDialog=true"
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-amber-200/80 hover:bg-amber-300 text-amber-950 font-bold rounded-lg text-xs transition-colors border border-amber-300"
